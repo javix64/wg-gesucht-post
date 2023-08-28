@@ -1,2 +1,3 @@
-links_visited.txt
-geckodriver.log
+node_modules
+.env
+src/scraping/wg-gesucht/.tmp/*.json

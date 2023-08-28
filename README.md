@@ -1,16 +1,12 @@
 # WG-GESUCHT-POST
-Definition: 
 
-This is a tool to automate get in BULK all apartament ads in [WG-GESUCHT](https://www.wg-gesucht.de/en/)
+## Instructions
 
-## Usage:
+Install global testcafe
+- Run `npm i -g testcafe`
 
-`scrap.py` receives two params:
+With this command you'll check your web-browsers, as i have firefox, i will run in it.
+Please change the script 'start' from package.json, with your web-browser.
+- Run `testcafe b`
 
-`username` is your username (e-mail)
-
-`password` is your password
-
-Run:
-
-`python scrap.py {username} {password}`
+- Run `npm run start`
