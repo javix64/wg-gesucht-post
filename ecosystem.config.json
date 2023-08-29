@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "name": "client react",
+      "script": "npm",
+      "args": "run client:dev"
+    },
+    {
+      "name": "backend koa",
+      "script": "node ./src/app"
+    }
+  ]
+}

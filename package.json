@@ -6,7 +6,12 @@
   "scripts": {
     "start:wg-gesucht": "node ./src/scraping/wg-gesucht/index",
     "start:server": "nodemon ./src/scraping/server/index",
-    "start:app": "nodemon ./src/app"
+    "start:app": "nodemon ./src/app",
+    "client:dev": "vite --host",
+    "client:build": "vite build",
+    "client:lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "client:preview": "vite preview",
+    "start": "pm2 start ecosystem.config.json"
   },
   "repository": {
     "type": "git",
@@ -23,11 +28,26 @@
   "dependencies": {
     "@koa/bodyparser": "^5.0.0",
     "@koa/cors": "^4.0.0",
+    "axios": "^1.5.0",
+    "formik": "^2.4.3",
     "koa": "^2.14.2",
     "koa-router": "^12.0.0",
-    "playwright-chromium": "^1.36.2"
+    "playwright-chromium": "^1.36.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.4",
+    "autoprefixer": "^10.4.15",
+    "eslint": "^8.48.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "nodemon": "^3.0.1",
+    "postcss": "^8.4.28",
+    "tailwindcss": "^3.3.3",
+    "vite": "^4.4.9"
   }
 }
