@@ -116,12 +116,12 @@ export const closeModalOnMessage = async(page) => {
     }
 }
 
-export const transformMessage = async (page, name) => {
-    const msg = `Hello ${name}, this is an example message.`
-    return msg;
+export const transformMessage = async (msg, name) => {
+    const msgReplacedByVariables = msg.replace('[name]',name);    
+    return msgReplacedByVariables;
 }
 
-export const onSendMessage = async (page)=> {
+export const onSendMessage = async (page, msg)=> {
     await closeModalOnMessage(page);
     const countLabels = await page.locator('.control-label').count();
     if(countLabels>1){
@@ -130,13 +130,12 @@ export const onSendMessage = async (page)=> {
     };
     const isMessaged = await page.locator('.control-label').isVisible();
     const name = await getNameFromAd(page);
-    // aqui chequear si el nombre esta en el array;
+    // Check if user was contacted, if it was, pass to the next one.
     if(checkIfContactIsOnFile(name)!=true) return;
-    const message = await transformMessage(page,name);
+    const message = await transformMessage(msg,name);
     const textArea = await page.locator('#message_input').fill(message);
     const onClickSendButton = await page.locator('button.create_new_conversation:nth-child(1)').click();
-    await page.waitForTimeout(15000);
-    console.info('sending message');
+    console.info('Message send it!');
 }
 
 export const popAndSaveFile = () => {
@@ -146,8 +145,7 @@ export const popAndSaveFile = () => {
     const file = fs.readFileSync(fileUrl);
     const fileParsed = JSON.parse(file);
     const lastAd = fileParsed.shift();
-    console.info(lastAd);
-    // fs.writeFileSync(fileUrl,JSON.stringify(fileParsed))
+    fs.writeFileSync(fileUrl,JSON.stringify(fileParsed))
     return lastAd;
 }
 

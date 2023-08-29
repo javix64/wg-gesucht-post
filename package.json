@@ -4,8 +4,9 @@
   "description": "Definition:",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/scraping/wg-gesucht/index",
-    "start:server": "nodemon ./src/server/index"
+    "start:wg-gesucht": "node ./src/scraping/wg-gesucht/index",
+    "start:server": "nodemon ./src/scraping/server/index",
+    "start:app": "nodemon ./src/app"
   },
   "repository": {
     "type": "git",
@@ -20,9 +21,9 @@
   },
   "homepage": "https://github.com/javix64/wg-gesucht-post#readme",
   "dependencies": {
-    "dotenv": "^16.3.1",
+    "@koa/bodyparser": "^5.0.0",
+    "@koa/cors": "^4.0.0",
     "koa": "^2.14.2",
-    "koa-json": "^2.0.2",
     "koa-router": "^12.0.0",
     "playwright-chromium": "^1.36.2"
   },

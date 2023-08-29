@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import { chromium } from "playwright-chromium";
 import {
   acceptCookies,
@@ -20,10 +18,10 @@ import {
 } from "./helper.js";
 const BASEURL = "https://www.wg-gesucht.de/";
 
-const start = async () => {
+export const wgGesucht = async (data) => {
   // config playwright
   console.info("Starting...");
-  const { WG_GESUCHT_USERNAME, WG_GESUCHT_PASSWORD, WG_GESUCHT_URL } = process.env;
+  const {email, password, url, msg} = data;
   const browser = await chromium.launch({
     headless: false,
   });
@@ -35,18 +33,18 @@ const start = async () => {
   // login
   await page.goto(BASEURL);
   await acceptCookies(page);
-  await login(WG_GESUCHT_USERNAME, WG_GESUCHT_PASSWORD, page);
+  await login(email, password, page);
   await page.waitForTimeout(5000);
   const injectCaptcha = await page.evaluate(() => {
     window.localStorage.setItem(
       "_grecaptcha",
-      "09AHJ_tr7tHAQY2-ggrUFUtjk1LwJShRxXpQSmJAPJWi_fdtmUk37ZdvfP1ObD6fjBwgQhcWqvz9E2cBAxyP0pd0BNYdsxTszwzY-HHg"
+      "09AG8ZzssrwXG9NXBSG2VOrkgzjBlgsuLbRnH8bda6aRnHgFCtnEI7CuUwQAmQXEBuOEBMFwFH4SHkIfacJuAruzUNPaRyMSRYRWOb-A"
     );
   });
+  deleteUrlsBeforeStart();
   // await checkIfUserContactedHasCreatedAnotherOffer(page);
   // obtain current url;
-  await page.goto(WG_GESUCHT_URL);
-  deleteUrlsBeforeStart();
+  await page.goto(url);
   const h1 = await page.locator("h1").textContent();
   console.info("Number of ads", extractNumberOfOffers(h1));
   const pages = await totalPages(page);
@@ -61,11 +59,13 @@ const start = async () => {
   do {
     const adUrlMessage = await popAndSaveFile();
     await page.goto(adUrlMessage);
-    await onSendMessage(page);
+    await onSendMessage(page, msg);
     await page.waitForTimeout(5000);
   } while (isFileEmpty() > 0);
-  // finish
+  finish
   await page.waitForTimeout(10000);
   await browser.close();
+  // ToDo: need return some data save, as:
+  // - total ads
+  // - Many people contacted
 };
-start();
