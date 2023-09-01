@@ -22,13 +22,13 @@ export class Server {
       })
     });
     // Methods not allowed in the rest of paths.
-    this.router.get(/(.*)/, (ctx, next) => {
+    this.router.get(/(.*)/, (ctx) => {
       this.notFoundUrl(ctx);
-    }).post(/(.*)/, (ctx, next) => {
+    }).post(/(.*)/, (ctx) => {
       this.notFoundUrl(ctx);
-    }).put(/(.*)/, (ctx, next) => {
+    }).put(/(.*)/, (ctx) => {
       this.notFoundUrl(ctx);
-    }).delete(/(.*)/, (ctx, next) => {
+    }).delete(/(.*)/, (ctx) => {
       this.notFoundUrl(ctx);
     });
     return this.router.routes();

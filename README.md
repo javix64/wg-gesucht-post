@@ -16,7 +16,7 @@ I did this tool in Python, two years ago when I moved to Kiel. Now that I have m
 
 This command run a PM2 process that execute two processes: `npm run client:dev` & `node ./src/app`. The first one will execute the client side, second one will execute the backend part.
 
-Client side can be visited by: `localhost:5137`
+Client side can be visited by: `localhost:5173`
 
 When client is loaded:
 
@@ -42,6 +42,5 @@ When client is loaded:
 
 ### Backend
 
-- Handle captcha for wg-gesucht
 - Handle errors
-- Be able to handle different views of pages
+- Be able to handle different page views.

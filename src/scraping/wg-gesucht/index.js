@@ -1,4 +1,5 @@
 import { chromium } from "playwright-chromium";
+import { startTransition } from "react";
 import {
   acceptCookies,
   getAdsListView,
@@ -15,6 +16,7 @@ import {
   getAdsDetailView,
   deleteUrlsBeforeStart,
   checkIfUserContactedHasCreatedAnotherOffer,
+  skipCatchaMiddleware,
 } from "./helper.js";
 const BASEURL = "https://www.wg-gesucht.de/";
 
@@ -32,19 +34,15 @@ export const wgGesucht = async (data) => {
   const page = await context.newPage();
   // login
   await page.goto(BASEURL);
+  await skipCatchaMiddleware(page);
   await acceptCookies(page);
   await login(email, password, page);
   await page.waitForTimeout(5000);
-  const injectCaptcha = await page.evaluate(() => {
-    window.localStorage.setItem(
-      "_grecaptcha",
-      "09AG8ZzssrwXG9NXBSG2VOrkgzjBlgsuLbRnH8bda6aRnHgFCtnEI7CuUwQAmQXEBuOEBMFwFH4SHkIfacJuAruzUNPaRyMSRYRWOb-A"
-    );
-  });
   deleteUrlsBeforeStart();
   // await checkIfUserContactedHasCreatedAnotherOffer(page);
   // obtain current url;
   await page.goto(url);
+  await skipCatchaMiddleware(page);
   const h1 = await page.locator("h1").textContent();
   console.info("Number of ads", extractNumberOfOffers(h1));
   const pages = await totalPages(page);
@@ -59,11 +57,13 @@ export const wgGesucht = async (data) => {
   do {
     const adUrlMessage = await popAndSaveFile();
     await page.goto(adUrlMessage);
+    await skipCatchaMiddleware(page);
     await onSendMessage(page, msg);
     await page.waitForTimeout(5000);
   } while (isFileEmpty() > 0);
-  finish
+  // finish
   await page.waitForTimeout(10000);
+  console.info('Finished');
   await browser.close();
   // ToDo: need return some data save, as:
   // - total ads

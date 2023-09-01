@@ -11,7 +11,7 @@ export const acceptCookies = async (page) => {
 }
 
 export const login = async (username, password, page) => {
-    const loginModal = await page.evaluate(()=> fireLoginOrRegisterModalRequest('sign_in'));
+    await page.evaluate(()=> fireLoginOrRegisterModalRequest('sign_in'));
     const usernameInput = '#login_email_username'; 
     const passwordInput = 'div.col-md-12:nth-child(2) > div:nth-child(2) > input:nth-child(1)'; 
     const loginButton = '#login_submit';
@@ -26,6 +26,8 @@ export const totalPages = async (page) => {
     const totalPages = Math.ceil(numberOfOffers/20);
     return totalPages;
 }
+
+
 
 export const saveUrlsInFile = (urls = []) => {
     try{
@@ -71,7 +73,7 @@ export const getAdsDetailView = async (page) => {
     const allTr = await Promise.all(
         tr.map(async (ad)=>{
             const textAd = await ad.locator('xpath=/div/div[1]').innerText();
-            const textAd2 = await ad.locator('xpath=/div/div[2]/div[3]/div[2]/div[2]/div/span[1]').innerText();
+            // const textAd2 = await ad.locator('xpath=/div/div[2]/div[3]/div[2]/div[2]/div/span[1]').innerText();
             const adHref = await ad.locator('xpath=/div/div[1]/a').getAttribute('href');
             const sendMessageUrl = 'https://www.wg-gesucht.de/en/nachricht-senden'
             const combinedUrl = `${sendMessageUrl}${adHref.replace('en/','')}`;
@@ -91,8 +93,21 @@ export function extractNumberOfOffers(inputString) {
     }
 }  
 
+export const skipCatchaMiddleware = async (page) => {
+    let url = await page.url();
+    let newUrl ='';
+    const stringCaptcha = 'en/cuba.html?page=/'
+    if(!url.includes(stringCaptcha)) return;
+    do {
+        newUrl = url.replace(stringCaptcha,'');
+        await page.waitForTimeout(1000);
+        await page.goto(newUrl);
+    } while (newUrl.includes(stringCaptcha));
+}
+
 export const iteratePages = async (page) => {
     // const listAds = await getAdsListView(page);
+    await skipCatchaMiddleware(page);
     const listAds = await getAdsDetailView(page);
     const nextPageButton = await page.locator('#assets_list_pagination > ul:nth-child(1) > li:last-child').click();
     await page.waitForLoadState('domcontentloaded');
