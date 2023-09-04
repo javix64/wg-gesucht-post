@@ -1,98 +1,88 @@
-import { Field, Formik, Form } from "formik";
-import axios from "axios";
-
+import { Formik, Form } from "formik";
+import { scrapWgGesucht } from "../../services/scrapWgGesucht";
+import { Button, Grid, TextField, Typography } from "@mui/material";
 const WGgesucht = () => {
-  const styles = {
-    element: ["h-10", "mx-5", "text-xl"].join(" "),
-    label: ["mt-2", "font-bold", "pl-1"].join(" "),
-    field: ["opacity-80", "rounded-lg", "shadow-lg", "pl-2"].join(" "),
-    textArea: [
-      "opacity-80",
-      "mx-5",
-      "h-56",
-      "rounded-lg",
-      "shadow-lg",
-      "p-2",
-    ].join(" "),
-    button: [
-      "font-bold",
-      "text-xl",
-      "my-5",
-      "rounded-lg",
-      "bg-white",
-      "shadow-lg",
-      "bg-gradient-to-t",
-      "from-lime-200",
-      "sm:w-96",
-      "sm:mx-auto",
-      "mt-6",
-    ].join(" "),
-  };
-
-  const { field, textArea, label, element, button } = styles;
-
-  const postData = (url, data) => {
-    axios
-      .post(url, data)
-      .then((res) => {
-        console.info("posted data:", res.data);
-      })
-      .catch((err) => {
-        console.info("error", err);
-      });
-  };
-
   return (
-    <>
-      <h1 className="text-3xl text-center sm:mt-40 mt-10 md:mt-10 mb-4">
+    <Grid container direction="column" alignItems="center">
+      <Typography variant="h3" component="h1" textAlign="center" sx={{marginTop:'1%', marginBottom:'1%'}}>
         WG-Gesucht App
-      </h1>
+      </Typography>
       <Formik
         initialValues={{ email: "", password: "", url: "", msg: "" }}
         onSubmit={(values) => {
-          postData("http://localhost:3000", values);
+          scrapWgGesucht(values);
         }}
       >
-        <Form className="bg-slate-800 bg-opacity-10 border-2 rounded-2xl flex flex-col mx-5 sm:mx-20 xl:mx-96 mb-20">
-          <label htmlFor="email" className={[element, label].join(" ")}>
-            Email
-          </label>
-          <Field
-            type="text"
-            name="email"
-            className={[element, field].join(" ")}
-          />
-          <label htmlFor="password" className={[element, label].join(" ")}>
-            Password
-          </label>
-          <Field
-            type="password"
-            name="password"
-            className={[element, field].join(" ")}
-          />
-          <label htmlFor="url" className={[element, label].join(" ")}>
-            Url
-          </label>
-          <Field
-            type="text"
-            name="url"
-            className={[element, field].join(" ")}
-          />
-          <label htmlFor="msg" className={[element, label].join(" ")}>
-            Message
-          </label>
-          <Field
-            type="text"
-            name="msg"
-            component="textarea"
-            className={textArea}
-          />
-          <button type="submit" className={[element, button].join(" ")}>
-            Submit
-          </button>
-        </Form>
+        {({ values, handleChange, handleBlur }) => (
+          <Grid
+            component={Form}
+            container
+            spacing={2}
+            direction="column"
+            maxWidth="md"
+          >
+            <Grid item>
+              <TextField
+                fullWidth
+                id="email"
+                label="Email"
+                variant="outlined"
+                defaultValue={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                fullWidth
+                id="password"
+                label="Password"
+                type="password"
+                variant="outlined"
+                defaultValue={values.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                fullWidth
+                id="url"
+                label="Url"
+                variant="outlined"
+                defaultValue={values.url}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                fullWidth
+                id="msg"
+                label="Message"
+                multiline
+                variant="outlined"
+                minRows={10}
+                defaultValue={values.msg}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Grid>
+            <Grid item alignItems="center">
+              <Button
+                variant="outlined"
+                color="inherit"
+                type="submit"
+                size="large"
+                sx={{ minWidth: "80%", margin: "auto", display: "block" }}
+              >
+                Submit!
+              </Button>
+            </Grid>
+          </Grid>
+        )}
       </Formik>
-    </>
+    </Grid>
   );
 };
 

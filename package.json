@@ -26,6 +26,11 @@
   },
   "homepage": "https://github.com/javix64/wg-gesucht-post#readme",
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.14.7",
+    "@mui/material": "^5.14.7",
     "@koa/bodyparser": "^5.0.0",
     "@koa/cors": "^4.0.0",
     "axios": "^1.5.0",
@@ -41,14 +46,11 @@
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.4",
-    "autoprefixer": "^10.4.15",
     "eslint": "^8.48.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "nodemon": "^3.0.1",
-    "postcss": "^8.4.28",
-    "tailwindcss": "^3.3.3",
     "vite": "^4.4.9"
   }
 }
