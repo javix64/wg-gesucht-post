@@ -1,25 +1,21 @@
-import { AppBar, Box, Toolbar, Button } from "@mui/material";
+import { AppBar, Box, Toolbar, Button, Typography } from "@mui/material";
 
 const Navbar = () => {
   return (
     <Box>
       <AppBar position="static">
-        <Toolbar>
-          <Button
-            color="inherit"
-            href="/"
-            component="div"
-            variant="h6"
-            sx={{ flexGrow: 3 }}
-          >
-            Home
+        <Toolbar sx={{ flex: 1, justifyContent: "space-between" }}>
+          <Button color="inherit" href="/">
+            <Typography variant="h5" component="p">Home</Typography>
           </Button>
-          <Button color="inherit" href="/faq">
-            F.A.Q
-          </Button>
-          <Button color="inherit" href="/instructions">
-            Instructions
-          </Button>
+          <Box component="div">
+            <Button color="inherit" href="/faq">
+              F.A.Q
+            </Button>
+            <Button color="inherit" href="/instructions">
+              Instructions
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>

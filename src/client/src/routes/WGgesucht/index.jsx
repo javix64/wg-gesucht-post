@@ -3,7 +3,7 @@ import { scrapWgGesucht } from "../../services/scrapWgGesucht";
 import { Button, Grid, TextField, Typography } from "@mui/material";
 const WGgesucht = () => {
   return (
-    <Grid container direction="column" alignItems="center">
+    <Grid container direction="column" alignItems="center" >
       <Typography variant="h3" component="h1" textAlign="center" sx={{marginTop:'1%', marginBottom:'1%'}}>
         WG-Gesucht App
       </Typography>
