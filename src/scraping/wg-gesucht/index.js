@@ -29,7 +29,7 @@ export const wgGesucht = async (data) => {
   });
   const context = await browser.newContext({
     userAgent:
-      "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0",
+      "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0",
   });
   const page = await context.newPage();
   // login
@@ -69,3 +69,7 @@ export const wgGesucht = async (data) => {
   // - total ads
   // - Many people contacted
 };
+
+export const wgGesuchtEmail = async (url) => {
+  
+}

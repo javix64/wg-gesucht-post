@@ -1,9 +1,9 @@
+import "dotenv/config.js";
 import Koa from "koa";
 import Router from "koa-router";
-import { bodyParser} from "@koa/bodyparser";
-import {wgGesucht} from "../scraping/wg-gesucht/index.js";
-import cors from '@koa/cors';
-
+import { bodyParser } from "@koa/bodyparser";
+import { wgGesucht } from "../scraping/wg-gesucht/index.js";
+import cors from "@koa/cors";
 export class Server {
   constructor() {
     this.app = new Koa();
@@ -15,22 +15,26 @@ export class Server {
     // Only method allowed in root.
     this.router.post("/", async (ctx, next) => {
       // pass data for start
-      const data =ctx.request.body;
-      await new Promise(async (res,rej)=>{
+      const data = ctx.request.body;
+      await new Promise(async (res, rej) => {
         await wgGesucht(data);
-        res(ctx.body='done');
-      })
+        res((ctx.body = "done"));
+      });
     });
     // Methods not allowed in the rest of paths.
-    this.router.get(/(.*)/, (ctx) => {
-      this.notFoundUrl(ctx);
-    }).post(/(.*)/, (ctx) => {
-      this.notFoundUrl(ctx);
-    }).put(/(.*)/, (ctx) => {
-      this.notFoundUrl(ctx);
-    }).delete(/(.*)/, (ctx) => {
-      this.notFoundUrl(ctx);
-    });
+    this.router
+      .get(/(.*)/, (ctx) => {
+        this.notFoundUrl(ctx);
+      })
+      .post(/(.*)/, (ctx) => {
+        this.notFoundUrl(ctx);
+      })
+      .put(/(.*)/, (ctx) => {
+        this.notFoundUrl(ctx);
+      })
+      .delete(/(.*)/, (ctx) => {
+        this.notFoundUrl(ctx);
+      });
     return this.router.routes();
   }
   middlewares() {
@@ -38,14 +42,12 @@ export class Server {
     this.app.use(bodyParser());
     this.app.use(this.routes());
   }
-  notFoundUrl(ctx){
-    ctx.res.statusCode=404;
+  notFoundUrl(ctx) {
+    ctx.res.statusCode = 404;
     ctx.body = "Not found :)";
   }
   start() {
-    this.app
-    .listen(this.port)
-    .timeout=1000*600
+    this.app.listen(this.port).timeout = 1000 * 600;
     console.info("app started");
   }
 }
