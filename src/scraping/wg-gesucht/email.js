@@ -24,7 +24,7 @@ export class Email {
           
           imap.on("mail", function (msg) {
             imap.search(
-              ["UNSEEN", ["FROM", "jav1.x64@gmail.com"]],
+              ["UNSEEN", ["FROM", process.env.MY_EMAIL]],
               (err, results) => {
                 if (err) throw err;
                 else if (!results || !results.length) {
