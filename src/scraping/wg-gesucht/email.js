@@ -3,7 +3,9 @@ import { simpleParser } from "mailparser";
 import Imap from "imap";
 import { WGgesucht } from "./index.js";
 export class Email {
-  constructor() {}
+  constructor() {
+    this.getEmailsFromWGGesucht();
+  }
   getEmailsFromWGGesucht() {
     try {
       const self = this;
@@ -30,22 +32,22 @@ export class Email {
                 else if (!results || !results.length) {
                   console.log("no emails");
                 } else {
-                  const f = imap.fetch(results, { bodies: "", markSeen:true });
+                  const f = imap.fetch(results, { bodies: "", markSeen: true });
                   f.on("message", (msg) => {
                     msg.on("body", (stream) => {
                       simpleParser(stream, async (err, parsed) => {
                         const { textAsHtml } = parsed;
+                        const url = self.extractHref(textAsHtml);
+                        if (url === null) return;
                         const wg = new WGgesucht();
-                        const url = self.extractHref(textAsHtml)
                         await wg.launchChromium();
                         await wg.navigateToWgGesucht();
-                        await wg.onEmailReceive(url)
+                        await wg.onEmailReceive(url);
                       });
                     });
                   });
                   f.once("end", () => {
                     console.log("Done fetching all messages!");
-                    imap.end();
                   });
                 }
               }
@@ -58,11 +60,10 @@ export class Email {
     }
   }
   extractHref(msgBody) {
-    // ToDo: check if email has more than one URL
     const regex = /VIEW OFFER &lt;<a href="([^"]+)"/;
     const match = msgBody.match(regex);
     if (match && match[1]) {
-      const url = match[1].replace('?campaign=suchauftrag_detail','');
+      const url = match[1].replace("?campaign=suchauftrag_detail", "");
       return url;
     } else {
       return null; // Return null if no match is found

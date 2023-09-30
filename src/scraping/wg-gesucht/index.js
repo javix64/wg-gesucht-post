@@ -70,11 +70,11 @@ export class WGgesucht {
   // Receiving a post from server
   async loopOffers(url, message) {
     console.info("Starting...");
-    const { url:urlSaved, message:messageSaved } = this.data;
+    const { url: urlSaved, message: messageSaved } = this.data;
     await this.page.waitForTimeout(5000);
     deleteUrlsBeforeStart();
-    if(!url)await this.page.goto(urlSaved);
-    else await this.page.goto(url)
+    if (!url) await this.page.goto(urlSaved);
+    else await this.page.goto(url);
     const h1 = await this.page.locator("h1").textContent();
     console.info("Number of ads", extractNumberOfOffers(h1));
     const pages = await this.totalPages();
@@ -90,7 +90,7 @@ export class WGgesucht {
       const adUrlMessage = await popAndSaveFile();
       await this.page.goto(adUrlMessage);
       await this.skipCatchaMiddleware();
-      if(!message)await this.onSendMessage(messageSaved);
+      if (!message) await this.onSendMessage(messageSaved);
       else await this.onSendMessage(message);
       await this.page.waitForTimeout(5000);
     } while (isFileEmpty() > 0);
@@ -101,10 +101,7 @@ export class WGgesucht {
   }
   // launc this function when an email is Received
   async onEmailReceive(url) {
-    // check if email has one or more than one url
-    // https://www.wg-gesucht.de/en/nachricht-senden https://www.wg-gesucht.de/10533332.html
-    console.info('')
-    const urlMessage = replaceOfferUrlForSendMessageUrl(url);
+    const urlMessage = await this.visitOfferAndGetUrlMessage(url);
     await this.page.goto(urlMessage);
     await this.onSendMessage(this.data.message);
     await this.page.close();
@@ -146,7 +143,6 @@ export class WGgesucht {
     );
     return arrayUrls;
   }
-
   async getAdsDetailView() {
     const arrayUrls = [];
     const tr = await this.page.locator("div[data-id]").all();
@@ -222,7 +218,7 @@ export class WGgesucht {
     // const onClickSendButton = await this.page
     //   .locator("button.create_new_conversation:nth-child(1)")
     //   .click();
-    this.page.waitForTimeout(10000);
+    await this.page.waitForTimeout(10000);
     console.info("Message send it!");
   }
 
@@ -258,13 +254,13 @@ export class WGgesucht {
     } while (currentPage < lastPage);
     saveInFile(allNames);
   }
+  async visitOfferAndGetUrlMessage(url) {
+    await this.page.goto(url);
+    const messageUrl = await this.page
+      .locator(
+        "div.modal-body:nth-child(1) > div:nth-child(2) > div:nth-child(1) > a:nth-child(1)"
+      )
+      .getAttribute("href");
+    return messageUrl;
+  }
 }
-
-// test
-// const wg = new WGgesucht();
-
-// (async function () {
-//   await wg.launchChromium();
-//   await wg.navigateToWgGesucht();
-//   await wg.loopOffers();
-// })();
