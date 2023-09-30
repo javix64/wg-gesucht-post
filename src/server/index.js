@@ -2,8 +2,8 @@ import "dotenv/config.js";
 import Koa from "koa";
 import Router from "koa-router";
 import { bodyParser } from "@koa/bodyparser";
-import { wgGesucht } from "../scraping/wg-gesucht/index.js";
 import cors from "@koa/cors";
+import { WGgesucht } from "../scraping/wg-gesucht/index.js";
 export class Server {
   constructor() {
     this.app = new Koa();
@@ -15,10 +15,16 @@ export class Server {
     // Only method allowed in root.
     this.router.post("/", async (ctx, next) => {
       // pass data for start
-      const data = ctx.request.body;
+      const {email, password, url, msg} = ctx.request.body;
       await new Promise(async (res, rej) => {
-        await wgGesucht(data);
-        res((ctx.body = "done"));
+        const wg = new WGgesucht();
+        await wg.launchChromium();
+        if(email.length==0){
+          await wg.navigateToWgGesucht();
+          await wg.loopOffers();
+        }
+        await wg.navigateToWgGesucht(email,password);
+        await wg.loopOffers(url,msg);
       });
     });
     // Methods not allowed in the rest of paths.

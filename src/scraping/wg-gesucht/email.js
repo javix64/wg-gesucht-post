@@ -1,6 +1,7 @@
 import { simpleParser } from "mailparser";
-import {onSendMessage} from './helper.js'
+// import {onSendMessage} from './helper.js'
 import Imap from "imap";
+import { WGgesucht } from "./index.js";
 export class Email {
   constructor() {}
   getEmailsFromWGGesucht() {
@@ -21,7 +22,6 @@ export class Email {
       imap.connect();
       imap.once("ready", () => {
         imap.openBox("INBOX", false, (a) => {
-          
           imap.on("mail", function (msg) {
             imap.search(
               ["UNSEEN", ["FROM", process.env.MY_EMAIL]],
@@ -35,7 +35,11 @@ export class Email {
                     msg.on("body", (stream) => {
                       simpleParser(stream, async (err, parsed) => {
                         const { textAsHtml } = parsed;
-                        return self.extractHref(textAsHtml);
+                        const wg = new WGgesucht();
+                        const url = self.extractHref(textAsHtml)
+                        await wg.launchChromium();
+                        await wg.navigateToWgGesucht();
+                        await wg.onEmailReceive(url)
                       });
                     });
                   });
@@ -54,6 +58,7 @@ export class Email {
     }
   }
   extractHref(msgBody) {
+    // ToDo: check if email has more than one URL
     const regex = /VIEW OFFER &lt;<a href="([^"]+)"/;
     const match = msgBody.match(regex);
     if (match && match[1]) {

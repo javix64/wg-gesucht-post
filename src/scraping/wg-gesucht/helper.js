@@ -2,32 +2,10 @@ import * as fs from 'fs';
 import path,{dirname, resolve} from 'path';
 import {URL} from 'url';
 
-export const acceptCookies = async (page) => {
-    const modalCookies = 'cmpbox';
-    const buttonAcceptCookies = '#cmpwelcomebtnyes';
-    const isVisible = await page.getByRole('div',{name:modalCookies});
-    if(!isVisible) return 'Not found';
-    await page.locator(buttonAcceptCookies).click();
+export const transformMessage = async (msg, name) => {
+    const msgReplacedByVariables = msg.replace('[name]',name);    
+    return msgReplacedByVariables;
 }
-
-export const login = async (username, password, page) => {
-    await page.evaluate(()=> fireLoginOrRegisterModalRequest('sign_in'));
-    const usernameInput = '#login_email_username'; 
-    const passwordInput = 'div.col-md-12:nth-child(2) > div:nth-child(2) > input:nth-child(1)'; 
-    const loginButton = '#login_submit';
-    await page.locator(usernameInput).fill(username)
-    await page.locator(passwordInput).fill(password);
-    await page.locator(loginButton).click();
-}
-
-export const totalPages = async (page) => {
-    const h1 = await page.locator('h1').textContent();
-    const numberOfOffers = extractNumberOfOffers(h1);
-    const totalPages = Math.ceil(numberOfOffers/20);
-    return totalPages;
-}
-
-
 
 export const saveUrlsInFile = (urls = []) => {
     try{
@@ -52,37 +30,6 @@ export const deleteUrlsBeforeStart = () => {
     fs.writeFileSync(file,JSON.stringify([]));
 }
 
-export const getAdsListView = async (page) => {
-    const arrayUrls = [];
-    const tr = await page.locator('tr').all();
-    const allTr = await Promise.all(
-        tr.map(async (ad)=>{
-            const lastUrl = await ad.getAttribute('adid');
-            if(lastUrl!=null) {
-                const sendMessageUrl = 'https://www.wg-gesucht.de/en/nachricht-senden/'
-                arrayUrls.push(`${sendMessageUrl}${lastUrl}`);
-            }
-        })
-    )
-    return arrayUrls;
-}
-
-export const getAdsDetailView = async (page) => {
-    const arrayUrls = [];
-    const tr = await page.locator('div[data-id]').all();
-    const allTr = await Promise.all(
-        tr.map(async (ad)=>{
-            const textAd = await ad.locator('xpath=/div/div[1]').innerText();
-            // const textAd2 = await ad.locator('xpath=/div/div[2]/div[3]/div[2]/div[2]/div/span[1]').innerText();
-            const adHref = await ad.locator('xpath=/div/div[1]/a').getAttribute('href');
-            const sendMessageUrl = 'https://www.wg-gesucht.de/en/nachricht-senden'
-            const combinedUrl = `${sendMessageUrl}${adHref.replace('en/','')}`;
-            if(!textAd.includes('contacted'))arrayUrls.push(combinedUrl);
-        })
-    )
-    return arrayUrls;
-}
-
 export function extractNumberOfOffers(inputString) {
     const matches = inputString.match(/\d+/);   
     if (matches && matches.length > 0) {
@@ -91,66 +38,6 @@ export function extractNumberOfOffers(inputString) {
     } else {
       return null;
     }
-}  
-
-export const skipCatchaMiddleware = async (page) => {
-    let url = await page.url();
-    let newUrl ='';
-    const stringCaptcha = 'en/cuba.html?page=/'
-    if(!url.includes(stringCaptcha)) return;
-    do {
-        newUrl = url.replace(stringCaptcha,'');
-        await page.waitForTimeout(1000);
-        await page.goto(newUrl);
-    } while (newUrl.includes(stringCaptcha));
-}
-
-export const iteratePages = async (page) => {
-    // const listAds = await getAdsListView(page);
-    await skipCatchaMiddleware(page);
-    const listAds = await getAdsDetailView(page);
-    const nextPageButton = await page.locator('#assets_list_pagination > ul:nth-child(1) > li:last-child').click();
-    await page.waitForLoadState('domcontentloaded');
-    saveUrlsInFile(listAds);
-}
-
-export const getNameFromAd = async (page) => {
-    const textNotFormatted = await page.locator('.control-label').textContent();
-    const textFormatted = textNotFormatted
-        .replace('Send message to ','')
-        .replace(':','')
-        .replace(/[\n\r]+|[\s]{2,}/g, ' ')
-        .replaceAll('  ', '');
-    return textFormatted;
-}
-
-export const closeModalOnMessage = async(page) => {
-    const acceptButtonId = '#sicherheit_bestaetigung';
-    if(await page.locator(acceptButtonId).isVisible()){
-        await page.locator(acceptButtonId).click();
-    }
-}
-
-export const transformMessage = async (msg, name) => {
-    const msgReplacedByVariables = msg.replace('[name]',name);    
-    return msgReplacedByVariables;
-}
-
-export const onSendMessage = async (page, msg)=> {
-    await closeModalOnMessage(page);
-    const countLabels = await page.locator('.control-label').count();
-    if(countLabels>1){
-        console.info('AlreadySend it')
-        return;
-    };
-    const isMessaged = await page.locator('.control-label').isVisible();
-    const name = await getNameFromAd(page);
-    // Check if user was contacted, if it was, pass to the next one.
-    if(checkIfContactIsOnFile(name)!=true) return;
-    const message = await transformMessage(msg,name);
-    const textArea = await page.locator('#message_input').fill(message);
-    const onClickSendButton = await page.locator('button.create_new_conversation:nth-child(1)').click();
-    console.info('Message send it!');
 }
 
 export const popAndSaveFile = () => {
@@ -171,29 +58,6 @@ export const isFileEmpty = () => {
     const fileParsed = JSON.parse(file);
     return fileParsed.length;
 }
-
-export const checkIfUserContactedHasCreatedAnotherOffer = async (page) =>{
-    await page.goto('https://www.wg-gesucht.de/en/nachrichten.html?filter_type=7');
-    const allNames = [];
-    let currentPage = 0;
-    const lastPage = parseInt(await page.locator('#pagination_container > ul:nth-child(1) > li:nth-last-child(2)').innerText());
-    // loop
-    do {
-        const usersContacted = await page.locator('.list_item_public_name').all();
-        const allUsersContacted = await Promise.all(
-            usersContacted.map(async (user)=>{
-                const userName = await user.innerText();
-                allNames.push(userName);
-            })
-        )
-        await page.locator('#pagination_container > ul:nth-child(1) > li:last-child').click();
-        await page.waitForLoadState('domcontentloaded');
-        currentPage +=1;
-    } while (currentPage < lastPage);
-    saveInFile(allNames);
-    // antes de enviar el mensaje, debo de recorrer el archivo y ver si encaja con el que ha hab'ia antes.
-}
-
 export const saveInFile = (content, file='usersContacted.json') => {
     //ToDo: it is repeated
     const fileUrl = new URL(`.tmp/${file}`, import.meta.url).pathname;
@@ -229,4 +93,15 @@ export const calcularDiferenciaEnMeses = (cadenaDeFechas)=> {
     const diferenciaEnMeses = (fechaFin.getFullYear() - fechaInicio.getFullYear()) * 12 +
         fechaFin.getMonth() - fechaInicio.getMonth();
     return diferenciaEnMeses;
+}
+
+export const replaceOfferUrlForSendMessageUrl = (notFormatedUrl) => {
+    // TODO: handle two kind of pollas en ollas.
+    // que obtengo de detailview: /en/wg-zimmer-in-Leipzig-Zentrum-West.10535508.html
+    // que obtengo de email: https://www.wg-gesucht.de/10533332.html
+    // https://www.wg-gesucht.de/en/nachricht-senden 
+    const sendMessageUrl = "https://www.wg-gesucht.de/en/nachricht-senden";
+    const combinedUrl = `${sendMessageUrl}${notFormatedUrl.replace("en/", "")}`;
+    return combinedUrl;
+
 }

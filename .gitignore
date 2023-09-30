@@ -1,4 +1,4 @@
 node_modules
 .env
-src/scraping/wg-gesucht/.tmp/*.json
+src/scraping/wg-gesucht/.tmp/*[.json,.js]
 src/client/dist
