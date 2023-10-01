@@ -215,9 +215,9 @@ export class WGgesucht {
     if (checkIfContactIsOnFile(name) != true) return;
     const message = await transformMessage(msg, name);
     const textArea = await this.page.locator("#message_input").fill(message);
-    // const onClickSendButton = await this.page
-    //   .locator("button.create_new_conversation:nth-child(1)")
-    //   .click();
+    const onClickSendButton = await this.page
+      .locator("button.create_new_conversation:nth-child(1)")
+      .click();
     await this.page.waitForTimeout(10000);
     console.info("Message send it!");
   }
