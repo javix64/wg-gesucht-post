@@ -16,14 +16,14 @@ export class WGgesucht {
     this.fileCookies = new URL(".tmp/cookies.json", import.meta.url).pathname;
     this.baseUrl = "https://www.wg-gesucht.de/";
     this.data = data;
-    this.context, this.page;
+    this.context, this.page, this.browser;
   }
 
   async launchChromium() {
-    const browser = await chromium.launch({
+    this.browser = await chromium.launch({
       headless: false,
     });
-    this.context = await browser.newContext({
+    this.context = await this.browser.newContext({
       userAgent:
         "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0",
     });
@@ -97,7 +97,7 @@ export class WGgesucht {
     // finish
     await this.page.waitForTimeout(10000);
     console.info("Finished");
-    await browser.close();
+    await this.browser.close();
   }
   // launc this function when an email is Received
   async onEmailReceive(url) {
